@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Drift Racer - An exciting drift racing game">
-    <title>Drift Racer - GitHub Pages</title>
+    <title>Realistic Drift Racer</title>
     <style>
         * {
             margin: 0;
@@ -13,233 +12,179 @@
         }
 
         body {
-            font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            background: #000;
             overflow: hidden;
-            padding: 20px;
         }
 
         #gameContainer {
             position: relative;
-            width: 100%;
-            max-width: 800px;
-            height: 600px;
-            background: #2a2a3e;
-            border: 4px solid #00ff88;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
+            width: 100vw;
+            height: 100vh;
         }
 
         #gameCanvas {
             display: block;
             width: 100%;
             height: 100%;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #8B8B8B 50%, #555 100%);
         }
 
         #ui {
             position: absolute;
             top: 20px;
             left: 20px;
-            color: #00ff88;
+            color: #fff;
             font-size: 24px;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                         0 0 10px rgba(0, 0, 0, 0.5);
             z-index: 10;
             pointer-events: none;
+            font-family: 'Impact', sans-serif;
         }
 
-        #score {
-            margin-bottom: 10px;
+        #speedometer {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.95) 100%);
+            border-radius: 50%;
+            border: 5px solid #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.1);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
-        #combo {
-            color: #ff00ff;
-            font-size: 32px;
-            animation: pulse 0.5s ease-in-out infinite;
+        #speedValue {
+            color: #00ff00;
+            font-size: 48px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px #00ff00;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        #speedLabel {
+            color: #fff;
+            font-size: 14px;
+            margin-top: -5px;
+        }
+
+        #driftIndicator {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            color: #ff1493;
+            font-size: 36px;
+            font-weight: bold;
+            text-shadow: 0 0 20px #ff1493, 2px 2px 4px rgba(0,0,0,0.8);
+            z-index: 10;
+            display: none;
+            animation: driftPulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes driftPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.8; }
+        }
+
+        #startScreen, #gameOver {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            backdrop-filter: blur(10px);
+        }
+
+        #gameOver {
+            display: none;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 72px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+            font-family: 'Impact', sans-serif;
+            letter-spacing: 4px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        p {
+            color: #ccc;
+            font-size: 18px;
+            margin-bottom: 40px;
+            text-align: center;
+            line-height: 1.8;
+            max-width: 600px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 20px 60px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
         }
 
         #instructions {
             position: absolute;
             top: 20px;
             right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            border-radius: 10px;
             color: #fff;
             font-size: 14px;
             text-align: right;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             z-index: 10;
-            pointer-events: none;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        @media (max-width: 768px) {
-            #instructions {
-                font-size: 11px;
-                top: 10px;
-                right: 10px;
-            }
-            
-            #ui {
-                font-size: 18px;
-                top: 10px;
-                left: 10px;
-            }
-            
-            #combo {
-                font-size: 24px;
-            }
+        .stat {
+            margin: 5px 0;
         }
 
-        #gameOver {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.95);
-            padding: 40px;
-            border-radius: 20px;
-            border: 3px solid #ff00ff;
-            text-align: center;
-            display: none;
-            z-index: 20;
-            box-shadow: 0 0 50px rgba(255, 0, 255, 0.5);
+        .stat-label {
+            color: #888;
+            font-size: 12px;
         }
 
-        #gameOver h1 {
-            color: #ff00ff;
-            font-size: 48px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
-        }
-
-        #gameOver p {
-            color: #00ff88;
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
-
-        #restartBtn {
-            background: linear-gradient(135deg, #ff00ff 0%, #00ff88 100%);
-            color: #000;
-            border: none;
-            padding: 15px 40px;
+        .stat-value {
+            color: #fff;
             font-size: 20px;
             font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(255, 0, 255, 0.4);
-        }
-
-        #restartBtn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(255, 0, 255, 0.6);
-        }
-
-        #startScreen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 30;
-            padding: 20px;
-        }
-
-        #startScreen h1 {
-            color: #00ff88;
-            font-size: 64px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
-        }
-
-        @media (max-width: 768px) {
-            #startScreen h1 {
-                font-size: 42px;
-            }
-        }
-
-        #startScreen p {
-            color: #fff;
-            font-size: 18px;
-            margin-bottom: 40px;
-            text-align: center;
-            line-height: 1.6;
-            max-width: 600px;
-        }
-
-        @media (max-width: 768px) {
-            #startScreen p {
-                font-size: 14px;
-                margin-bottom: 30px;
-            }
-        }
-
-        #startBtn {
-            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
-            color: #000;
-            border: none;
-            padding: 20px 50px;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
-        }
-
-        #startBtn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.6);
-        }
-
-        #footer {
-            margin-top: 20px;
-            color: #888;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        #footer a {
-            color: #00ff88;
-            text-decoration: none;
-        }
-
-        #footer a:hover {
-            text-decoration: underline;
-        }
-
-        .high-score {
-            position: absolute;
-            top: 60px;
-            left: 20px;
-            color: #ffaa00;
-            font-size: 18px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        @media (max-width: 768px) {
-            .high-score {
-                font-size: 14px;
-                top: 45px;
-                left: 10px;
-            }
         }
     </style>
 </head>
@@ -248,106 +193,158 @@
         <canvas id="gameCanvas"></canvas>
         
         <div id="ui">
-            <div id="score">Score: 0</div>
-            <div id="combo"></div>
+            <div class="stat">
+                <div class="stat-label">SCORE</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat" style="margin-top: 10px;">
+                <div class="stat-label">COMBO</div>
+                <div class="stat-value" id="combo" style="color: #ff6b6b;">×1</div>
+            </div>
         </div>
 
-        <div class="high-score" id="highScore">High Score: 0</div>
+        <div id="speedometer">
+            <div id="speedValue">0</div>
+            <div id="speedLabel">KM/H</div>
+        </div>
+
+        <div id="driftIndicator">
+            🔥 DRIFTING! 🔥
+        </div>
 
         <div id="instructions">
-            ← → Arrow Keys: Steer<br>
-            ↑ Arrow Key: Accelerate<br>
-            SPACE: Brake/Drift
+            <div style="margin-bottom: 10px; font-weight: bold; color: #4ecdc4;">CONTROLS</div>
+            ← → Steer<br>
+            ↑ Accelerate<br>
+            ↓ Brake<br>
+            SPACE Handbrake Drift
         </div>
 
         <div id="startScreen">
-            <h1>🏎️ DRIFT RACER</h1>
+            <h1><span class="gradient-text">DRIFT RACER 3D</span></h1>
             <p>
-                Drift around corners to score points!<br>
-                The longer you drift, the higher your combo!<br>
-                Avoid obstacles and keep drifting!<br><br>
-                <strong style="color: #00ff88;">Master the drift and set the high score!</strong>
+                Experience realistic drifting physics!<br>
+                Master the handbrake, control your slides, and chain combos.<br>
+                The asphalt is yours - show us what you've got!
             </p>
-            <button id="startBtn">START RACING</button>
+            <button id="startBtn">START ENGINE</button>
         </div>
 
         <div id="gameOver">
-            <h1>GAME OVER!</h1>
-            <p id="finalScore">Final Score: 0</p>
-            <p id="newHighScore" style="display: none; color: #ffaa00;">🏆 NEW HIGH SCORE! 🏆</p>
+            <h1>RACE COMPLETE</h1>
+            <p id="finalScore" style="font-size: 32px; color: #4ecdc4;">Final Score: 0</p>
+            <p id="finalStats" style="font-size: 16px; margin-top: -20px;"></p>
             <button id="restartBtn">RACE AGAIN</button>
         </div>
-    </div>
-
-    <div id="footer">
-        Created for GitHub Pages | <a href="https://github.com" target="_blank">View on GitHub</a>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 800;
-        canvas.height = 600;
-
-        // High score persistence
-        let highScore = parseInt(localStorage.getItem('driftRacerHighScore')) || 0;
-        document.getElementById('highScore').textContent = `High Score: ${highScore}`;
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
         // Game state
         let gameRunning = false;
         let score = 0;
-        let combo = 0;
+        let combo = 1;
+        let maxCombo = 1;
         let driftTime = 0;
-        let gameSpeed = 1;
+        let totalDriftTime = 0;
 
-        // Car properties
+        // Camera/perspective
+        const camera = {
+            x: 0,
+            y: 0,
+            z: 0,
+            pitch: 0.15 // Looking slightly down
+        };
+
+        // Car physics
         const car = {
-            x: canvas.width / 2,
-            y: canvas.height - 100,
-            width: 40,
-            height: 60,
+            x: 0,
+            y: 0,
+            z: -5,
             angle: 0,
             speed: 0,
-            maxSpeed: 8,
-            acceleration: 0.3,
-            friction: 0.95,
-            turnSpeed: 0.08,
+            maxSpeed: 15,
+            acceleration: 0.5,
+            brake: 0.7,
+            friction: 0.97,
+            driftFriction: 0.95,
+            turnSpeed: 0.04,
             drifting: false,
             driftAngle: 0,
             velocityX: 0,
-            velocityY: 0
+            velocityZ: 0,
+            wheelAngle: 0
         };
+
+        // Road properties
+        const road = {
+            width: 800,
+            segments: [],
+            segmentLength: 100,
+            curves: []
+        };
+
+        // Generate road segments
+        function generateRoad() {
+            road.segments = [];
+            for (let i = 0; i < 100; i++) {
+                const curve = Math.sin(i * 0.3) * 200 + (Math.random() - 0.5) * 100;
+                road.segments.push({
+                    z: i * road.segmentLength,
+                    curve: curve,
+                    x: 0
+                });
+            }
+        }
 
         // Obstacles
         let obstacles = [];
-        let obstacleTimer = 0;
-        const obstacleInterval = 100;
+        let lastObstacleZ = 0;
 
-        // Road markings
-        let roadMarkings = [];
-        for (let i = 0; i < 10; i++) {
-            roadMarkings.push({
-                x: canvas.width / 2,
-                y: i * 100,
-                width: 10,
-                height: 50
+        function spawnObstacle() {
+            if (car.z - lastObstacleZ > 300) {
+                const side = Math.random() > 0.5 ? 1 : -1;
+                obstacles.push({
+                    x: side * (road.width / 2 - 100),
+                    z: car.z + 2000,
+                    size: 40,
+                    type: 'cone'
+                });
+                lastObstacleZ = car.z;
+            }
+        }
+
+        // Drift particles
+        let particles = [];
+
+        function createDriftParticle() {
+            const angle = car.angle + (Math.random() - 0.5) * Math.PI;
+            particles.push({
+                x: car.x + Math.sin(angle) * 30,
+                y: 0,
+                z: car.z + Math.cos(angle) * 30,
+                life: 30 + Math.random() * 20,
+                size: 10 + Math.random() * 20,
+                vx: (Math.random() - 0.5) * 2,
+                vz: (Math.random() - 0.5) * 2
             });
         }
 
-        // Particles for drift effect
-        let particles = [];
-
-        // Input handling
+        // Input
         const keys = {};
-        
         document.addEventListener('keydown', (e) => {
             keys[e.key] = true;
-            // Prevent space from scrolling page
-            if (e.key === ' ') {
-                e.preventDefault();
-            }
+            if (e.key === ' ') e.preventDefault();
         });
-        
         document.addEventListener('keyup', (e) => {
             keys[e.key] = false;
         });
@@ -360,277 +357,377 @@
             document.getElementById('startScreen').style.display = 'none';
             gameRunning = true;
             score = 0;
-            combo = 0;
+            combo = 1;
+            maxCombo = 1;
             driftTime = 0;
-            gameSpeed = 1;
-            car.x = canvas.width / 2;
-            car.y = canvas.height - 100;
+            totalDriftTime = 0;
+            car.x = 0;
+            car.z = 0;
             car.angle = 0;
             car.speed = 0;
-            car.velocityX = 0;
-            car.velocityY = 0;
+            car.drifting = false;
             obstacles = [];
             particles = [];
-            obstacleTimer = 0;
+            lastObstacleZ = 0;
+            generateRoad();
             gameLoop();
         }
 
         function restartGame() {
             document.getElementById('gameOver').style.display = 'none';
-            document.getElementById('newHighScore').style.display = 'none';
             startGame();
         }
 
         function gameLoop() {
             if (!gameRunning) return;
-
             update();
             draw();
             requestAnimationFrame(gameLoop);
         }
 
         function update() {
-            // Gradually increase difficulty
-            gameSpeed = 1 + (score / 1000) * 0.5;
-
-            // Handle input
+            // Acceleration
             if (keys['ArrowUp']) {
                 car.speed = Math.min(car.speed + car.acceleration, car.maxSpeed);
-            } else {
-                car.speed *= car.friction;
+            } else if (keys['ArrowDown']) {
+                car.speed = Math.max(car.speed - car.brake, 0);
             }
+
+            // Apply friction
+            const currentFriction = car.drifting ? car.driftFriction : car.friction;
+            car.speed *= currentFriction;
 
             // Steering
+            const steerAmount = car.speed / car.maxSpeed;
             if (keys['ArrowLeft']) {
-                car.angle -= car.turnSpeed * (car.speed / car.maxSpeed);
-            }
-            if (keys['ArrowRight']) {
-                car.angle += car.turnSpeed * (car.speed / car.maxSpeed);
+                car.wheelAngle = Math.max(car.wheelAngle - 0.1, -1);
+            } else if (keys['ArrowRight']) {
+                car.wheelAngle = Math.min(car.wheelAngle + 0.1, 1);
+            } else {
+                car.wheelAngle *= 0.8;
             }
 
-            // Drifting
-            if (keys[' '] && car.speed > 3) {
+            // Handbrake drift
+            if (keys[' '] && car.speed > 5) {
                 car.drifting = true;
-                car.speed *= 0.98;
+                car.driftAngle += car.wheelAngle * 0.15;
+                car.driftAngle = Math.max(-1.2, Math.min(1.2, car.driftAngle));
                 
-                // Add drift angle
-                if (keys['ArrowLeft']) {
-                    car.driftAngle = Math.max(car.driftAngle - 0.05, -0.8);
-                } else if (keys['ArrowRight']) {
-                    car.driftAngle = Math.min(car.driftAngle + 0.05, 0.8);
-                }
-
-                // Drift scoring
                 driftTime++;
-                if (driftTime % 5 === 0) {
-                    combo++;
-                    score += combo * 2;
+                totalDriftTime++;
+                
+                if (driftTime % 3 === 0) {
+                    combo = Math.min(combo + 0.1, 10);
+                    score += Math.floor(10 * combo);
+                    maxCombo = Math.max(maxCombo, combo);
                 }
 
-                // Spawn drift particles
-                if (Math.random() > 0.5) {
-                    particles.push({
-                        x: car.x - Math.cos(car.angle) * 20,
-                        y: car.y - Math.sin(car.angle) * 20,
-                        size: Math.random() * 4 + 2,
-                        life: 30,
-                        velocityX: (Math.random() - 0.5) * 2,
-                        velocityY: Math.random() * 2 + 2
-                    });
+                // Create drift particles
+                if (Math.random() > 0.6) {
+                    createDriftParticle();
                 }
+
+                document.getElementById('driftIndicator').style.display = 'block';
             } else {
                 if (car.drifting) {
-                    // End drift bonus
-                    if (combo > 5) {
-                        score += combo * 10; // Bonus for long drifts
-                    }
-                    combo = 0;
+                    combo = 1;
                     driftTime = 0;
                 }
                 car.drifting = false;
-                car.driftAngle *= 0.9;
+                car.driftAngle *= 0.85;
+                document.getElementById('driftIndicator').style.display = 'none';
+            }
+
+            // Update angle based on steering
+            if (!car.drifting) {
+                car.angle += car.wheelAngle * car.turnSpeed * steerAmount;
+            } else {
+                car.angle += car.wheelAngle * car.turnSpeed * steerAmount * 0.5;
             }
 
             // Calculate velocity
             const totalAngle = car.angle + car.driftAngle;
             car.velocityX = Math.sin(totalAngle) * car.speed;
-            car.velocityY = -Math.cos(totalAngle) * car.speed;
+            car.velocityZ = Math.cos(totalAngle) * car.speed;
 
-            // Move car (inverse for scrolling effect)
+            // Move car
             car.x += car.velocityX;
+            car.z += car.velocityZ;
 
-            // Keep car on screen horizontally
-            car.x = Math.max(car.width, Math.min(canvas.width - car.width, car.x));
-
-            // Update road markings (scrolling effect)
-            roadMarkings.forEach(marking => {
-                marking.y += car.speed * gameSpeed;
-                if (marking.y > canvas.height) {
-                    marking.y = -50;
-                }
-            });
-
-            // Update obstacles
-            obstacleTimer++;
-            if (obstacleTimer > obstacleInterval / gameSpeed) {
-                obstacleTimer = 0;
-                obstacles.push({
-                    x: canvas.width / 2 + (Math.random() * 300 - 150),
-                    y: -50,
-                    width: 50,
-                    height: 50,
-                    speed: 3 + Math.random() * 2
-                });
+            // Keep car on road
+            const currentSegment = Math.floor(car.z / road.segmentLength) % road.segments.length;
+            const roadCenter = road.segments[currentSegment].curve;
+            
+            if (Math.abs(car.x - roadCenter) > road.width / 2 - 50) {
+                gameOver();
             }
 
-            obstacles.forEach((obs, index) => {
-                obs.y += (obs.speed + car.speed * 0.5) * gameSpeed;
+            // Update camera
+            camera.x = car.x;
+            camera.z = car.z - 150;
+
+            // Spawn obstacles
+            spawnObstacle();
+
+            // Update obstacles
+            obstacles.forEach((obs, i) => {
+                const dx = car.x - obs.x;
+                const dz = car.z - obs.z;
+                const dist = Math.sqrt(dx * dx + dz * dz);
                 
-                // Check collision
-                if (checkCollision(car, obs)) {
+                if (dist < 60) {
                     gameOver();
                 }
 
-                // Remove off-screen obstacles
-                if (obs.y > canvas.height) {
-                    obstacles.splice(index, 1);
-                    score += 10;
+                if (car.z - obs.z > 500) {
+                    obstacles.splice(i, 1);
+                    score += 50;
                 }
             });
 
             // Update particles
-            particles.forEach((p, index) => {
-                p.x += p.velocityX;
-                p.y += p.velocityY;
+            particles.forEach((p, i) => {
                 p.life--;
+                p.x += p.vx;
+                p.z += p.vz;
                 if (p.life <= 0) {
-                    particles.splice(index, 1);
+                    particles.splice(i, 1);
                 }
             });
 
             // Update UI
-            document.getElementById('score').textContent = `Score: ${score}`;
-            document.getElementById('combo').textContent = combo > 0 ? `COMBO x${combo}!` : '';
+            document.getElementById('score').textContent = Math.floor(score);
+            document.getElementById('combo').textContent = '×' + combo.toFixed(1);
+            document.getElementById('speedValue').textContent = Math.floor(car.speed * 20);
+        }
+
+        function project3D(x, y, z) {
+            const dx = x - camera.x;
+            const dy = y;
+            const dz = z - camera.z;
+
+            if (dz <= 0) return null;
+
+            const scale = 400 / dz;
+            const screenX = canvas.width / 2 + dx * scale;
+            const screenY = canvas.height / 2 + (dy - camera.pitch * dz) * scale;
+
+            return { x: screenX, y: screenY, scale: scale };
         }
 
         function draw() {
-            // Background (darker road)
-            ctx.fillStyle = '#1a1a1a';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Sky gradient
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
+            skyGradient.addColorStop(0, '#4A90E2');
+            skyGradient.addColorStop(1, '#87CEEB');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
 
-            // Grass borders
-            ctx.fillStyle = '#0a4d0a';
-            ctx.fillRect(0, 0, 50, canvas.height);
-            ctx.fillRect(canvas.width - 50, 0, 50, canvas.height);
+            // Ground
+            const groundGradient = ctx.createLinearGradient(0, canvas.height / 2, 0, canvas.height);
+            groundGradient.addColorStop(0, '#4a7c59');
+            groundGradient.addColorStop(1, '#2d5016');
+            ctx.fillStyle = groundGradient;
+            ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
 
-            // Road
-            ctx.fillStyle = '#333';
-            ctx.fillRect(50, 0, canvas.width - 100, canvas.height);
+            // Draw road segments
+            for (let i = 0; i < 50; i++) {
+                const segmentIndex = (Math.floor(car.z / road.segmentLength) + i) % road.segments.length;
+                const segment = road.segments[segmentIndex];
+                const nextSegment = road.segments[(segmentIndex + 1) % road.segments.length];
 
-            // Road edges
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(50, 0, 5, canvas.height);
-            ctx.fillRect(canvas.width - 55, 0, 5, canvas.height);
+                const z1 = segment.z;
+                const z2 = nextSegment.z;
 
-            // Road markings
-            ctx.fillStyle = '#ffff00';
-            roadMarkings.forEach(marking => {
-                ctx.fillRect(marking.x - marking.width / 2, marking.y, marking.width, marking.height);
-            });
+                const roadColor = i % 2 === 0 ? '#3a3a3a' : '#454545';
+                
+                // Project road corners
+                const p1Left = project3D(segment.curve - road.width / 2, 0, z1);
+                const p1Right = project3D(segment.curve + road.width / 2, 0, z1);
+                const p2Left = project3D(nextSegment.curve - road.width / 2, 0, z2);
+                const p2Right = project3D(nextSegment.curve + road.width / 2, 0, z2);
 
-            // Particles (drift smoke)
+                if (p1Left && p1Right && p2Left && p2Right) {
+                    // Draw road segment
+                    ctx.fillStyle = roadColor;
+                    ctx.beginPath();
+                    ctx.moveTo(p1Left.x, p1Left.y);
+                    ctx.lineTo(p1Right.x, p1Right.y);
+                    ctx.lineTo(p2Right.x, p2Right.y);
+                    ctx.lineTo(p2Left.x, p2Left.y);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Road markings
+                    if (i % 4 === 0) {
+                        const pCenter = project3D(segment.curve, 0, z1);
+                        const pCenterNext = project3D(nextSegment.curve, 0, z2);
+                        
+                        if (pCenter && pCenterNext) {
+                            ctx.strokeStyle = '#ffff00';
+                            ctx.lineWidth = 3 * pCenter.scale;
+                            ctx.beginPath();
+                            ctx.moveTo(pCenter.x, pCenter.y);
+                            ctx.lineTo(pCenterNext.x, pCenterNext.y);
+                            ctx.stroke();
+                        }
+                    }
+
+                    // Road edges
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(p1Left.x, p1Left.y);
+                    ctx.lineTo(p2Left.x, p2Left.y);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(p1Right.x, p1Right.y);
+                    ctx.lineTo(p2Right.x, p2Right.y);
+                    ctx.stroke();
+                }
+            }
+
+            // Draw particles
             particles.forEach(p => {
-                const alpha = p.life / 30;
-                ctx.fillStyle = `rgba(200, 200, 200, ${alpha * 0.6})`;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
+                const proj = project3D(p.x, p.y, p.z);
+                if (proj) {
+                    const alpha = p.life / 50;
+                    ctx.fillStyle = `rgba(100, 100, 100, ${alpha * 0.6})`;
+                    ctx.beginPath();
+                    ctx.arc(proj.x, proj.y, p.size * proj.scale, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             });
 
-            // Obstacles (cones)
+            // Draw obstacles (cones)
             obstacles.forEach(obs => {
-                ctx.save();
-                ctx.translate(obs.x, obs.y);
+                const proj = project3D(obs.x, 0, obs.z);
+                const projTop = project3D(obs.x, -60, obs.z);
                 
-                // Cone shape
-                ctx.fillStyle = '#ff4400';
-                ctx.beginPath();
-                ctx.moveTo(0, -obs.height / 2);
-                ctx.lineTo(obs.width / 2, obs.height / 2);
-                ctx.lineTo(-obs.width / 2, obs.height / 2);
-                ctx.closePath();
-                ctx.fill();
-                
-                // White stripe
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(-obs.width / 4, 0, obs.width / 2, 8);
-                
-                ctx.restore();
+                if (proj && projTop) {
+                    const size = obs.size * proj.scale;
+                    
+                    // Cone shadow
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    ctx.beginPath();
+                    ctx.ellipse(proj.x, proj.y + 2, size * 0.6, size * 0.3, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Cone body
+                    const gradient = ctx.createLinearGradient(proj.x - size, projTop.y, proj.x + size, proj.y);
+                    gradient.addColorStop(0, '#ff6600');
+                    gradient.addColorStop(0.5, '#ff8800');
+                    gradient.addColorStop(1, '#cc5500');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.moveTo(projTop.x, projTop.y);
+                    ctx.lineTo(proj.x - size, proj.y);
+                    ctx.lineTo(proj.x + size, proj.y);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // White stripe
+                    ctx.fillStyle = '#fff';
+                    const stripeY = projTop.y + (proj.y - projTop.y) * 0.4;
+                    ctx.beginPath();
+                    ctx.moveTo(projTop.x + (proj.x - size - projTop.x) * 0.4, stripeY);
+                    ctx.lineTo(projTop.x + (proj.x + size - projTop.x) * 0.4, stripeY);
+                    ctx.lineTo(proj.x + size * 0.8, proj.y);
+                    ctx.lineTo(proj.x - size * 0.8, proj.y);
+                    ctx.closePath();
+                    ctx.fill();
+                }
             });
 
-            // Draw car
+            // Draw car (centered)
+            const carProj = { x: canvas.width / 2, y: canvas.height * 0.75, scale: 1 };
+            
             ctx.save();
-            ctx.translate(car.x, car.y);
-            ctx.rotate(car.angle + car.driftAngle);
+            ctx.translate(carProj.x, carProj.y);
+            ctx.rotate(car.driftAngle * 0.5);
 
             // Car shadow
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-            ctx.fillRect(-car.width / 2 + 2, -car.height / 2 + 2, car.width, car.height);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.fillRect(-40, 50, 80, 120);
 
-            // Car body
-            ctx.fillStyle = car.drifting ? '#ff00ff' : '#00ff88';
-            ctx.fillRect(-car.width / 2, -car.height / 2, car.width, car.height);
-            
-            // Car window
-            ctx.fillStyle = '#222';
-            ctx.fillRect(-car.width / 2 + 8, -car.height / 2 + 8, car.width - 16, 18);
-            
-            // Car spoiler
-            ctx.fillStyle = '#000';
-            ctx.fillRect(-car.width / 2 - 2, car.height / 2 - 10, car.width + 4, 5);
-            
-            // Drift glow effect
+            // Car body with gradient for 3D effect
+            const carGradient = ctx.createLinearGradient(-40, -60, 40, 60);
             if (car.drifting) {
-                ctx.strokeStyle = 'rgba(255, 0, 255, 0.8)';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(-car.width / 2 - 4, -car.height / 2 - 4, car.width + 8, car.height + 8);
+                carGradient.addColorStop(0, '#ff1493');
+                carGradient.addColorStop(0.5, '#ff69b4');
+                carGradient.addColorStop(1, '#ff1493');
+            } else {
+                carGradient.addColorStop(0, '#e74c3c');
+                carGradient.addColorStop(0.5, '#c0392b');
+                carGradient.addColorStop(1, '#e74c3c');
+            }
+            
+            ctx.fillStyle = carGradient;
+            ctx.fillRect(-40, -60, 80, 120);
+
+            // Car details
+            // Windshield
+            ctx.fillStyle = 'rgba(100, 150, 200, 0.6)';
+            ctx.fillRect(-30, -50, 60, 40);
+
+            // Roof
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(-35, -55, 70, 35);
+
+            // Hood lines
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-20, 20);
+            ctx.lineTo(-20, 60);
+            ctx.moveTo(20, 20);
+            ctx.lineTo(20, 60);
+            ctx.stroke();
+
+            // Headlights
+            ctx.fillStyle = '#ffff99';
+            ctx.fillRect(-35, 50, 15, 8);
+            ctx.fillRect(20, 50, 15, 8);
+
+            // Wheels
+            ctx.fillStyle = '#000';
+            ctx.save();
+            ctx.translate(-30, -30);
+            ctx.rotate(car.wheelAngle * 0.3);
+            ctx.fillRect(-8, -12, 16, 24);
+            ctx.restore();
+
+            ctx.save();
+            ctx.translate(30, -30);
+            ctx.rotate(car.wheelAngle * 0.3);
+            ctx.fillRect(-8, -12, 16, 24);
+            ctx.restore();
+
+            ctx.fillRect(-38, 30, 16, 24);
+            ctx.fillRect(22, 30, 16, 24);
+
+            // Drift glow
+            if (car.drifting) {
+                ctx.strokeStyle = 'rgba(255, 20, 147, 0.6)';
+                ctx.lineWidth = 6;
+                ctx.strokeRect(-45, -65, 90, 130);
                 
-                ctx.strokeStyle = 'rgba(255, 0, 255, 0.4)';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(-car.width / 2 - 8, -car.height / 2 - 8, car.width + 16, car.height + 16);
+                ctx.strokeStyle = 'rgba(255, 105, 180, 0.3)';
+                ctx.lineWidth = 12;
+                ctx.strokeRect(-50, -70, 100, 140);
             }
 
             ctx.restore();
         }
 
-        function checkCollision(car, obs) {
-            const distance = Math.sqrt(
-                Math.pow(car.x - obs.x, 2) + 
-                Math.pow(car.y - obs.y, 2)
-            );
-            
-            return distance < (car.width + obs.width) / 2;
-        }
-
         function gameOver() {
             gameRunning = false;
-            
-            // Check for high score
-            if (score > highScore) {
-                highScore = score;
-                localStorage.setItem('driftRacerHighScore', highScore.toString());
-                document.getElementById('highScore').textContent = `High Score: ${highScore}`;
-                document.getElementById('newHighScore').style.display = 'block';
-            }
-            
-            document.getElementById('finalScore').textContent = `Final Score: ${score}`;
-            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('finalScore').textContent = `Final Score: ${Math.floor(score)}`;
+            document.getElementById('finalStats').textContent = 
+                `Max Combo: ×${maxCombo.toFixed(1)} | Total Drift Time: ${(totalDriftTime / 60).toFixed(1)}s`;
+            document.getElementById('gameOver').style.display = 'flex';
         }
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            // Game auto-adjusts with CSS
-        });
     </script>
 </body>
 </html>
