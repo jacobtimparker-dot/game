@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Drift Racer - An exciting drift racing game">
+    <title>Drift Racer - GitHub Pages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            background: #2a2a3e;
+            border: 4px solid #00ff88;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ff88;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        #score {
+            margin-bottom: 10px;
+        }
+
+        #combo {
+            color: #ff00ff;
+            font-size: 32px;
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        #instructions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            font-size: 14px;
+            text-align: right;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            #instructions {
+                font-size: 11px;
+                top: 10px;
+                right: 10px;
+            }
+            
+            #ui {
+                font-size: 18px;
+                top: 10px;
+                left: 10px;
+            }
+            
+            #combo {
+                font-size: 24px;
+            }
+        }
+
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid #ff00ff;
+            text-align: center;
+            display: none;
+            z-index: 20;
+            box-shadow: 0 0 50px rgba(255, 0, 255, 0.5);
+        }
+
+        #gameOver h1 {
+            color: #ff00ff;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+        }
+
+        #gameOver p {
+            color: #00ff88;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        #restartBtn {
+            background: linear-gradient(135deg, #ff00ff 0%, #00ff88 100%);
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 0, 255, 0.4);
+        }
+
+        #restartBtn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 0, 255, 0.6);
+        }
+
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            padding: 20px;
+        }
+
+        #startScreen h1 {
+            color: #00ff88;
+            font-size: 64px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            #startScreen h1 {
+                font-size: 42px;
+            }
+        }
+
+        #startScreen p {
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 40px;
+            text-align: center;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        @media (max-width: 768px) {
+            #startScreen p {
+                font-size: 14px;
+                margin-bottom: 30px;
+            }
+        }
+
+        #startBtn {
+            background: linear-gradient(135deg, #00ff88 0%, #00ccff 100%);
+            color: #000;
+            border: none;
+            padding: 20px 50px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        #startBtn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.6);
+        }
+
+        #footer {
+            margin-top: 20px;
+            color: #888;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        #footer a {
+            color: #00ff88;
+            text-decoration: none;
+        }
+
+        #footer a:hover {
+            text-decoration: underline;
+        }
+
+        .high-score {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            color: #ffaa00;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .high-score {
+                font-size: 14px;
+                top: 45px;
+                left: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui">
+            <div id="score">Score: 0</div>
+            <div id="combo"></div>
+        </div>
+
+        <div class="high-score" id="highScore">High Score: 0</div>
+
+        <div id="instructions">
+            ← → Arrow Keys: Steer<br>
+            ↑ Arrow Key: Accelerate<br>
+            SPACE: Brake/Drift
+        </div>
+
+        <div id="startScreen">
+            <h1>🏎️ DRIFT RACER</h1>
+            <p>
+                Drift around corners to score points!<br>
+                The longer you drift, the higher your combo!<br>
+                Avoid obstacles and keep drifting!<br><br>
+                <strong style="color: #00ff88;">Master the drift and set the high score!</strong>
+            </p>
+            <button id="startBtn">START RACING</button>
+        </div>
+
+        <div id="gameOver">
+            <h1>GAME OVER!</h1>
+            <p id="finalScore">Final Score: 0</p>
+            <p id="newHighScore" style="display: none; color: #ffaa00;">🏆 NEW HIGH SCORE! 🏆</p>
+            <button id="restartBtn">RACE AGAIN</button>
+        </div>
+    </div>
+
+    <div id="footer">
+        Created for GitHub Pages | <a href="https://github.com" target="_blank">View on GitHub</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 800;
+        canvas.height = 600;
+
+        // High score persistence
+        let highScore = parseInt(localStorage.getItem('driftRacerHighScore')) || 0;
+        document.getElementById('highScore').textContent = `High Score: ${highScore}`;
+
+        // Game state
+        let gameRunning = false;
+        let score = 0;
+        let combo = 0;
+        let driftTime = 0;
+        let gameSpeed = 1;
+
+        // Car properties
+        const car = {
+            x: canvas.width / 2,
+            y: canvas.height - 100,
+            width: 40,
+            height: 60,
+            angle: 0,
+            speed: 0,
+            maxSpeed: 8,
+            acceleration: 0.3,
+            friction: 0.95,
+            turnSpeed: 0.08,
+            drifting: false,
+            driftAngle: 0,
+            velocityX: 0,
+            velocityY: 0
+        };
+
+        // Obstacles
+        let obstacles = [];
+        let obstacleTimer = 0;
+        const obstacleInterval = 100;
+
+        // Road markings
+        let roadMarkings = [];
+        for (let i = 0; i < 10; i++) {
+            roadMarkings.push({
+                x: canvas.width / 2,
+                y: i * 100,
+                width: 10,
+                height: 50
+            });
+        }
+
+        // Particles for drift effect
+        let particles = [];
+
+        // Input handling
+        const keys = {};
+        
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            // Prevent space from scrolling page
+            if (e.key === ' ') {
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        // Start game
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        document.getElementById('restartBtn').addEventListener('click', restartGame);
+
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            gameRunning = true;
+            score = 0;
+            combo = 0;
+            driftTime = 0;
+            gameSpeed = 1;
+            car.x = canvas.width / 2;
+            car.y = canvas.height - 100;
+            car.angle = 0;
+            car.speed = 0;
+            car.velocityX = 0;
+            car.velocityY = 0;
+            obstacles = [];
+            particles = [];
+            obstacleTimer = 0;
+            gameLoop();
+        }
+
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('newHighScore').style.display = 'none';
+            startGame();
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            // Gradually increase difficulty
+            gameSpeed = 1 + (score / 1000) * 0.5;
+
+            // Handle input
+            if (keys['ArrowUp']) {
+                car.speed = Math.min(car.speed + car.acceleration, car.maxSpeed);
+            } else {
+                car.speed *= car.friction;
+            }
+
+            // Steering
+            if (keys['ArrowLeft']) {
+                car.angle -= car.turnSpeed * (car.speed / car.maxSpeed);
+            }
+            if (keys['ArrowRight']) {
+                car.angle += car.turnSpeed * (car.speed / car.maxSpeed);
+            }
+
+            // Drifting
+            if (keys[' '] && car.speed > 3) {
+                car.drifting = true;
+                car.speed *= 0.98;
+                
+                // Add drift angle
+                if (keys['ArrowLeft']) {
+                    car.driftAngle = Math.max(car.driftAngle - 0.05, -0.8);
+                } else if (keys['ArrowRight']) {
+                    car.driftAngle = Math.min(car.driftAngle + 0.05, 0.8);
+                }
+
+                // Drift scoring
+                driftTime++;
+                if (driftTime % 5 === 0) {
+                    combo++;
+                    score += combo * 2;
+                }
+
+                // Spawn drift particles
+                if (Math.random() > 0.5) {
+                    particles.push({
+                        x: car.x - Math.cos(car.angle) * 20,
+                        y: car.y - Math.sin(car.angle) * 20,
+                        size: Math.random() * 4 + 2,
+                        life: 30,
+                        velocityX: (Math.random() - 0.5) * 2,
+                        velocityY: Math.random() * 2 + 2
+                    });
+                }
+            } else {
+                if (car.drifting) {
+                    // End drift bonus
+                    if (combo > 5) {
+                        score += combo * 10; // Bonus for long drifts
+                    }
+                    combo = 0;
+                    driftTime = 0;
+                }
+                car.drifting = false;
+                car.driftAngle *= 0.9;
+            }
+
+            // Calculate velocity
+            const totalAngle = car.angle + car.driftAngle;
+            car.velocityX = Math.sin(totalAngle) * car.speed;
+            car.velocityY = -Math.cos(totalAngle) * car.speed;
+
+            // Move car (inverse for scrolling effect)
+            car.x += car.velocityX;
+
+            // Keep car on screen horizontally
+            car.x = Math.max(car.width, Math.min(canvas.width - car.width, car.x));
+
+            // Update road markings (scrolling effect)
+            roadMarkings.forEach(marking => {
+                marking.y += car.speed * gameSpeed;
+                if (marking.y > canvas.height) {
+                    marking.y = -50;
+                }
+            });
+
+            // Update obstacles
+            obstacleTimer++;
+            if (obstacleTimer > obstacleInterval / gameSpeed) {
+                obstacleTimer = 0;
+                obstacles.push({
+                    x: canvas.width / 2 + (Math.random() * 300 - 150),
+                    y: -50,
+                    width: 50,
+                    height: 50,
+                    speed: 3 + Math.random() * 2
+                });
+            }
+
+            obstacles.forEach((obs, index) => {
+                obs.y += (obs.speed + car.speed * 0.5) * gameSpeed;
+                
+                // Check collision
+                if (checkCollision(car, obs)) {
+                    gameOver();
+                }
+
+                // Remove off-screen obstacles
+                if (obs.y > canvas.height) {
+                    obstacles.splice(index, 1);
+                    score += 10;
+                }
+            });
+
+            // Update particles
+            particles.forEach((p, index) => {
+                p.x += p.velocityX;
+                p.y += p.velocityY;
+                p.life--;
+                if (p.life <= 0) {
+                    particles.splice(index, 1);
+                }
+            });
+
+            // Update UI
+            document.getElementById('score').textContent = `Score: ${score}`;
+            document.getElementById('combo').textContent = combo > 0 ? `COMBO x${combo}!` : '';
+        }
+
+        function draw() {
+            // Background (darker road)
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grass borders
+            ctx.fillStyle = '#0a4d0a';
+            ctx.fillRect(0, 0, 50, canvas.height);
+            ctx.fillRect(canvas.width - 50, 0, 50, canvas.height);
+
+            // Road
+            ctx.fillStyle = '#333';
+            ctx.fillRect(50, 0, canvas.width - 100, canvas.height);
+
+            // Road edges
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(50, 0, 5, canvas.height);
+            ctx.fillRect(canvas.width - 55, 0, 5, canvas.height);
+
+            // Road markings
+            ctx.fillStyle = '#ffff00';
+            roadMarkings.forEach(marking => {
+                ctx.fillRect(marking.x - marking.width / 2, marking.y, marking.width, marking.height);
+            });
+
+            // Particles (drift smoke)
+            particles.forEach(p => {
+                const alpha = p.life / 30;
+                ctx.fillStyle = `rgba(200, 200, 200, ${alpha * 0.6})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Obstacles (cones)
+            obstacles.forEach(obs => {
+                ctx.save();
+                ctx.translate(obs.x, obs.y);
+                
+                // Cone shape
+                ctx.fillStyle = '#ff4400';
+                ctx.beginPath();
+                ctx.moveTo(0, -obs.height / 2);
+                ctx.lineTo(obs.width / 2, obs.height / 2);
+                ctx.lineTo(-obs.width / 2, obs.height / 2);
+                ctx.closePath();
+                ctx.fill();
+                
+                // White stripe
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(-obs.width / 4, 0, obs.width / 2, 8);
+                
+                ctx.restore();
+            });
+
+            // Draw car
+            ctx.save();
+            ctx.translate(car.x, car.y);
+            ctx.rotate(car.angle + car.driftAngle);
+
+            // Car shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(-car.width / 2 + 2, -car.height / 2 + 2, car.width, car.height);
+
+            // Car body
+            ctx.fillStyle = car.drifting ? '#ff00ff' : '#00ff88';
+            ctx.fillRect(-car.width / 2, -car.height / 2, car.width, car.height);
+            
+            // Car window
+            ctx.fillStyle = '#222';
+            ctx.fillRect(-car.width / 2 + 8, -car.height / 2 + 8, car.width - 16, 18);
+            
+            // Car spoiler
+            ctx.fillStyle = '#000';
+            ctx.fillRect(-car.width / 2 - 2, car.height / 2 - 10, car.width + 4, 5);
+            
+            // Drift glow effect
+            if (car.drifting) {
+                ctx.strokeStyle = 'rgba(255, 0, 255, 0.8)';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(-car.width / 2 - 4, -car.height / 2 - 4, car.width + 8, car.height + 8);
+                
+                ctx.strokeStyle = 'rgba(255, 0, 255, 0.4)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(-car.width / 2 - 8, -car.height / 2 - 8, car.width + 16, car.height + 16);
+            }
+
+            ctx.restore();
+        }
+
+        function checkCollision(car, obs) {
+            const distance = Math.sqrt(
+                Math.pow(car.x - obs.x, 2) + 
+                Math.pow(car.y - obs.y, 2)
+            );
+            
+            return distance < (car.width + obs.width) / 2;
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            
+            // Check for high score
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('driftRacerHighScore', highScore.toString());
+                document.getElementById('highScore').textContent = `High Score: ${highScore}`;
+                document.getElementById('newHighScore').style.display = 'block';
+            }
+            
+            document.getElementById('finalScore').textContent = `Final Score: ${score}`;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            // Game auto-adjusts with CSS
+        });
+    </script>
+</body>
+</html>
